@@ -17,6 +17,7 @@ if(process.env.NODE_ENV !== "PRODUCTION"){
     })
 }
 
+//it is for error handler
 app.use(ErrorHandler);
 
 module.exports = app;
