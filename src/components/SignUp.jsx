@@ -10,6 +10,7 @@ const SignUp = () => {
   const [password, setPassword] = useState("");
   const [visible, setVisible] = useState(false);
   const [avatar, setAvatar] = useState(null);
+  const [confirmPassword, setConfirmPassword] = useState(""); 
 
   const handleFileInputChange = (e) => {
     const reader = new FileReader();
@@ -104,6 +105,35 @@ const SignUp = () => {
                     onClick={() => setVisible(true)}
                   />
                 )}
+              </div>
+            </div>
+            <div>
+              <div>
+                <label htmlFor="password">Confirm Password</label>
+                <div className="mt-1 relative">
+                  <input
+                    type={visible ? "text" : "password"}
+                    name="password"
+                    autoComplete="current-password"
+                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder:bg-gray-400 focus:outline-none focus:ring-blue-500 focus-border-blue-500 sm:text-sm"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                  />
+                  {visible ? (
+                    <AiOutlineEye
+                      size={25}
+                      className="absolute right-2 top-2 cursor-pointer text-gray-500"
+                      onClick={() => setVisible(false)}
+                    />
+                  ) : (
+                    <AiOutlineEyeInvisible
+                      size={25}
+                      className="absolute right-2 top-2 cursor-pointer text-gray-500"
+                      onClick={() => setVisible(true)}
+                    />
+                  )}
+                </div>
               </div>
             </div>
             <div>
