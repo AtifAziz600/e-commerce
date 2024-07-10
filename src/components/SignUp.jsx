@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { RxAvatar } from "react-icons/rx";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios"
+import { server } from "../server";
 // import styles from "../styles/styles";
 
 const SignUp = () => {
@@ -10,19 +12,44 @@ const SignUp = () => {
   const [password, setPassword] = useState("");
   const [visible, setVisible] = useState(false);
   const [avatar, setAvatar] = useState(null);
-  const [confirmPassword, setConfirmPassword] = useState(""); 
+  const navigate = useNavigate();
 
   const handleFileInputChange = (e) => {
-    const reader = new FileReader();
+    const file = e.target.files[0];
+    setAvatar(file);
+  }
+  // const handleFileInputChange = (e) => {
+  //   const reader = new FileReader();
 
-    reader.onload = () => {
-      if (reader.readyState === 2) {
-        setAvatar(reader.result);
+  //   reader.onload = () => {
+  //     if (reader.readyState === 2) {
+  //       setAvatar(reader.result);
+  //     }
+  //   };
+
+  //   reader.readAsDataURL(e.target.files[0]);
+  // };
+
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const config = {headers: {"Content-Type":"multipart/form-data"}};
+
+    const newForm = new FormData();
+
+    newForm.append("file", avatar);
+    newForm.append("name", name);
+    newForm.append("email", email);
+    newForm.append("password", password);
+
+    axios.post(`${server}/user/create-user`, newForm, config).then((res) => {
+      if (res.data.success === true) {
+        navigate("/");
       }
-    };
-
-    reader.readAsDataURL(e.target.files[0]);
-  };
+    }).catch((err) => {
+      console.log(err);
+    })
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -33,7 +60,7 @@ const SignUp = () => {
       </div>
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white shadow rounded py-8 px-4 sm:px-10">
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label className="block text-gray-700 font-medium" htmlFor="name">
                 Full Name
@@ -107,35 +134,7 @@ const SignUp = () => {
                 )}
               </div>
             </div>
-            <div>
-              <div>
-                <label htmlFor="password">Confirm Password</label>
-                <div className="mt-1 relative">
-                  <input
-                    type={visible ? "text" : "password"}
-                    name="password"
-                    autoComplete="current-password"
-                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder:bg-gray-400 focus:outline-none focus:ring-blue-500 focus-border-blue-500 sm:text-sm"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    required
-                  />
-                  {visible ? (
-                    <AiOutlineEye
-                      size={25}
-                      className="absolute right-2 top-2 cursor-pointer text-gray-500"
-                      onClick={() => setVisible(false)}
-                    />
-                  ) : (
-                    <AiOutlineEyeInvisible
-                      size={25}
-                      className="absolute right-2 top-2 cursor-pointer text-gray-500"
-                      onClick={() => setVisible(true)}
-                    />
-                  )}
-                </div>
-              </div>
-            </div>
+
             <div>
               <label
                 className="block text-gray-700 font-medium"
