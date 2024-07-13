@@ -11,12 +11,14 @@ const SignUp = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [visible, setVisible] = useState(false);
+  const [avaImg, setAvaImg] = useState("")
   const [avatar, setAvatar] = useState(null);
   const navigate = useNavigate();
 
   const handleFileInputChange = (e) => {
     const file = e.target.files[0];
     setAvatar(file);
+    setAvaImg(URL.createObjectURL(file));
   }
   // const handleFileInputChange = (e) => {
   //   const reader = new FileReader();
@@ -33,7 +35,7 @@ const SignUp = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const config = {headers: {"Content-Type":"multipart/form-data"}};
+    const config = { headers: { "Content-Type": "multipart/form-data" } };
 
     const newForm = new FormData();
 
@@ -146,7 +148,7 @@ const SignUp = () => {
                 <span className="inline-block h-8 w-8 rounded-full overflow-hidden">
                   {avatar ? (
                     <img
-                      src={avatar}
+                      src={avaImg}
                       alt="avatar"
                       className="h-full w-full object-cover rounded-full"
                     />
