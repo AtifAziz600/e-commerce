@@ -5,16 +5,21 @@ const {upload} = require("../multer");
 const User = require("../model/user");
 const fs = require("fs");
 const ErrorHandler = require("../utils/ErrorHandler");
+const catchAsyncError = require("../middleware/catchAsyncError");
 const sendMail = require("../utils/sendMail");
+const jwt = require("jsonwebtoken");
+
 
 router.post("/create-user", upload.single("file"), async (req,res,next) => {
+  
   try {
     const { name, email, password } = req.body;
     const userEmail = await User.findOne({ email });
-
+    
     if (userEmail) {
       const filename = req.file.filename;
       const filePath = `uploads/${filename}`;
+      console.log(filename)
       fs.unlink(filePath, (err) => {
         if (err) {
           console.log(err);
@@ -28,6 +33,7 @@ router.post("/create-user", upload.single("file"), async (req,res,next) => {
 
     const filename = req.file.filename;
     const fileURL = path.join(filename);
+    console.log(filename);
     const user = {
       name: name,
       email: email,
@@ -35,6 +41,7 @@ router.post("/create-user", upload.single("file"), async (req,res,next) => {
       avatar: fileURL,
     };
     const activationToken = createActivationToken(user);
+    console.log(createActivationToken);
     const activationURL = `http://localhost:3000/activation/${activationToken}`;
 
     try {
@@ -54,12 +61,44 @@ router.post("/create-user", upload.single("file"), async (req,res,next) => {
   } catch (error) {
     return next(new ErrorHandler(error.message, 400));
   }
-  // create activation token
+  
+});
+// create activation token inisialize korar somoye function use korar age inisialize ta thakte hobe
   const createActivationToken = (user) => {
     return jwt.sign(user, process.env.ACTIVATION_SECRET, {
       expiresIn: "10m",
     });
   };
-});
+
+
+//activate user
+router.post("/activation", catchAsyncError(async (req, res, next) => {
+  try {
+    const { activation_token } = req.body;
+    const newUser = 
+    jwt.verify(
+      activation_token, 
+      process.env.ACTIVATION_SECRET
+    );
+
+    if(!newUser) {
+      return next(new ErrorHandler("Invalid Token!", 400));
+    }
+    const { name, email, password, avatar } = newUser;
+
+    User.create({
+      name,
+      email,
+      password,
+      avatar,
+    });
+
+    sendToken(newUser, 201, res)
+    
+  } catch (error) {
+    return next(new ErrorHandler(error.message, 500))
+  }
+} 
+))
 
 module.exports = router;
